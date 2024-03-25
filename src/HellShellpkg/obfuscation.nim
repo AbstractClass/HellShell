@@ -4,9 +4,13 @@ import std/[sequtils,strformat,strutils, sugar]
 proc toEvenHex(bytes: seq[uint8], sizeNeeded: int8): seq[string] =
     let 
         hex = bytes.toSeq.mapIt(it.toHex.toLower)
-        remainder = sizeNeeded - hex.len.mod(sizeNeeded)
+        offset = hex.len.mod(sizeNeeded)
+        remainder = case offset:
+            of 0: 0
+            else: sizeNeeded - offset
         padding = @["90"].cycle(remainder)
-    writeLine(stderr, &"[*] Shellcode is {hex.len} bytes, adding {remainder} NOPs to make UUIDs")
+    #echo "Offset: ", offset, " Remainder: ", remainder
+    writeLine(stderr, &"[*] Shellcode is {hex.len} bytes, adding {remainder} NOPs to make payload")
     
     return concat(padding, hex) # add NOP sled to make the sequence evenly devisible
     
